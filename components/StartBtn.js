@@ -6,7 +6,7 @@ const CIRCLE_SIZE = BTN_SIZE + 8;
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-export default function StartBtn() {
+export default function StartBtn({ startGame }) {
     const animatedScale = useRef(new Animated.Value(1)).current;
     const animatedOpacity = useRef(new Animated.Value(1)).current;
     const animatedColor = useRef(new Animated.Value(0)).current;
@@ -19,7 +19,7 @@ export default function StartBtn() {
             toValue: Dimensions.get('screen').width,
             duration: 1000,
             useNativeDriver: true,
-        }).start();
+        }).start(startGame);
     };
 
     useEffect(() => {
