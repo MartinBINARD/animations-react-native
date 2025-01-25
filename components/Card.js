@@ -9,10 +9,11 @@ const SPACE_BETWEEN_CARDS = 12;
 const CARD_WIDTH = (SCREEN_WIDTH - MARGIN_HORIZONTAL * 2 - SPACE_BETWEEN_CARDS * 2) / 3;
 const CARD_HEIGHT = (SCREEN_HEIGHT - MARGIN_VERTICAL * 2 - SPACE_BETWEEN_CARDS * 3) / 4;
 
-export default function Card({ index, shouldDistribute, card }) {
+export default function Card({ index, shouldDistribute, card, onPressCard, isFlipped, isCleared }) {
     const animatedLeft = useRef(new Animated.Value(SCREEN_WIDTH / 2 - CARD_WIDTH / 2)).current;
     const animatedTop = useRef(new Animated.Value(SCREEN_HEIGHT / 2 - CARD_HEIGHT / 2)).current;
     const animatedRotation = useRef(new Animated.Value(0)).current;
+    const animatedOpacity = useRef(new Animated.Value(1)).current;
 
     const distribute = () => {
         Animated.parallel([
@@ -49,12 +50,32 @@ export default function Card({ index, shouldDistribute, card }) {
         }
     }, [shouldDistribute]);
 
+    useEffect(() => {
+        if (isCleared) {
+            Animated.timing(animatedOpacity, {
+                toValue: 0,
+                duration: 500,
+                useNativeDriver: true,
+            }).start();
+        } else if (isFlipped) {
+            Animated.timing(animatedRotation, {
+                toValue: 1,
+                duration: 500,
+                useNativeDriver: true,
+            }).start();
+        } else {
+            Animated.timing(animatedRotation, {
+                toValue: 0,
+                duration: 500,
+                useNativeDriver: true,
+            }).start();
+        }
+    }, [isFlipped, isCleared]);
+
     const flipCard = () => {
-        Animated.timing(animatedRotation, {
-            toValue: 1,
-            duration: 500,
-            useNativeDriver: true,
-        }).start();
+        if (!isCleared && !isFlipped) {
+            onPressCard(card);
+        }
     };
 
     const spin = animatedRotation.interpolate({
@@ -73,6 +94,7 @@ export default function Card({ index, shouldDistribute, card }) {
                 styles.container,
                 {
                     transform: [{ translateX: animatedLeft }, { translateY: animatedTop }],
+                    opacity: animatedOpacity,
                 },
             ]}
         >
