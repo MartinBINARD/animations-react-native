@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Animated, Dimensions, Pressable, StyleSheet } from 'react-native';
+import { Animated, Dimensions, Image, Pressable, StyleSheet } from 'react-native';
 
 const SCREEN_WIDTH = Dimensions.get('screen').width;
 const SCREEN_HEIGHT = Dimensions.get('screen').height;
@@ -62,6 +62,11 @@ export default function Card({ index, shouldDistribute, card }) {
         outputRange: ['0deg', '180deg'],
     });
 
+    const reverseSpein = animatedRotation.interpolate({
+        inputRange: [0, 1],
+        outputRange: ['180deg', '0deg'],
+    });
+
     return (
         <Animated.View
             style={[
@@ -72,18 +77,18 @@ export default function Card({ index, shouldDistribute, card }) {
             ]}
         >
             <Pressable style={styles.cardContainer} onPress={flipCard}>
-                <Animated.Image
+                <Animated.View
                     style={[
                         styles.card,
                         styles.frontCard,
                         {
-                            transform: [{ rotateY: spin }, { perspective: 1000 }],
+                            transform: [{ rotateY: reverseSpein }, { perspective: 1000 }],
                         },
                     ]}
-                    resizeMode="contain"
-                    source={card.source}
-                />
-                <Animated.Image
+                >
+                    <Image style={styles.image} source={card.source} />
+                </Animated.View>
+                <Animated.View
                     style={[
                         styles.card,
                         styles.backCard,
@@ -91,9 +96,9 @@ export default function Card({ index, shouldDistribute, card }) {
                             transform: [{ rotateY: spin }, { perspective: 1000 }],
                         },
                     ]}
-                    resizeMode="contain"
-                    source={require('../assets/pokeball.png')}
-                />
+                >
+                    <Image style={styles.image} source={require('../assets/pokeball.png')} />
+                </Animated.View>
             </Pressable>
         </Animated.View>
     );
@@ -115,11 +120,17 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         backgroundColor: 'powderblue',
         position: 'absolute',
+        backfaceVisibility: 'hidden',
     },
     frontCard: {
         backgroundColor: 'coral',
     },
     backCard: {
         backgroundColor: 'powderblue',
+    },
+    image: {
+        width: CARD_WIDTH,
+        height: CARD_HEIGHT,
+        resizeMode: 'contain',
     },
 });
