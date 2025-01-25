@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Animated, Dimensions, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Animated, Dimensions, Pressable, StyleSheet, Text } from 'react-native';
 
 const BTN_SIZE = Dimensions.get('screen').width / 2;
 const CIRCLE_SIZE = BTN_SIZE + 8;
@@ -10,10 +10,16 @@ export default function StartBtn() {
     const animatedScale = useRef(new Animated.Value(1)).current;
     const animatedOpacity = useRef(new Animated.Value(1)).current;
     const animatedColor = useRef(new Animated.Value(0)).current;
+    const animatedTranslate = useRef(new Animated.Value(0)).current;
 
     const onPress = () => {
         animatedOpacity.resetAnimation();
         animatedScale.resetAnimation();
+        Animated.timing(animatedTranslate, {
+            toValue: Dimensions.get('screen').width,
+            duration: 1000,
+            useNativeDriver: true,
+        }).start();
     };
 
     useEffect(() => {
@@ -49,7 +55,7 @@ export default function StartBtn() {
     });
 
     return (
-        <View style={styles.container}>
+        <Animated.View style={[styles.container, { transform: [{ translateX: animatedTranslate }] }]}>
             <AnimatedPressable style={[styles.btn, { backgroundColor: interpolatedColor }]} onPress={onPress}>
                 <Text style={styles.text}>Jouer</Text>
             </AnimatedPressable>
@@ -63,7 +69,7 @@ export default function StartBtn() {
                     },
                 ]}
             />
-        </View>
+        </Animated.View>
     );
 }
 
