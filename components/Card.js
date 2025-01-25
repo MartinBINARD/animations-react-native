@@ -9,7 +9,7 @@ const SPACE_BETWEEN_CARDS = 12;
 const CARD_WIDTH = (SCREEN_WIDTH - MARGIN_HORIZONTAL * 2 - SPACE_BETWEEN_CARDS * 2) / 3;
 const CARD_HEIGHT = (SCREEN_HEIGHT - MARGIN_VERTICAL * 2 - SPACE_BETWEEN_CARDS * 3) / 4;
 
-export default function Card({ index, shouldDistribute, card, onPressCard, isFlipped, isCleared }) {
+export default function Card({ index, shouldDistribute, card, onPressCard, isFlipped, isCleared, shouldRestart, setShouldRestart }) {
     const animatedLeft = useRef(new Animated.Value(SCREEN_WIDTH / 2 - CARD_WIDTH / 2)).current;
     const animatedTop = useRef(new Animated.Value(SCREEN_HEIGHT / 2 - CARD_HEIGHT / 2)).current;
     const animatedRotation = useRef(new Animated.Value(0)).current;
@@ -41,7 +41,7 @@ export default function Card({ index, shouldDistribute, card, onPressCard, isFli
                 delay: index * 100, // Augmente le délai à chaque carte
                 useNativeDriver: true,
             }),
-        ]).start();
+        ]).start(() => setShouldRestart(false));
     };
 
     useEffect(() => {
@@ -49,6 +49,20 @@ export default function Card({ index, shouldDistribute, card, onPressCard, isFli
             distribute();
         }
     }, [shouldDistribute]);
+
+    const initPosition = () => {
+        animatedLeft.setValue(-SCREEN_WIDTH / 2);
+        animatedTop.setValue(-SCREEN_HEIGHT / 2);
+        animatedOpacity.setValue(1);
+        animatedRotation.setValue(0);
+        distribute();
+    };
+
+    useEffect(() => {
+        if (shouldRestart) {
+            initPosition();
+        }
+    }, [shouldRestart]);
 
     useEffect(() => {
         if (isCleared) {
